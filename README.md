@@ -1,4 +1,4 @@
-# 🤖 Machine Learning
+# 🧠 Machine Learning
 
 <p align="center">
   <strong>From Raw Data to Intelligent Models.</strong>
