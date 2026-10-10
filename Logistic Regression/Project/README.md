@@ -1,201 +1,278 @@
-# Titanic Survival Prediction — Logistic Regression
+# 🚢 Titanic Survival Prediction
 
-## Project Overview
+<p align="center">
+  <strong>A Machine Learning Classification Project with Logistic Regression</strong>
+  <br>
+  Exploring passenger data, building preprocessing pipelines, and predicting survival outcomes.
+</p>
 
-This project uses Seaborn's Titanic dataset to predict whether a passenger survived the Titanic disaster.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas">
+  <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Scikit-learn">
+  <img src="https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white" alt="Jupyter Notebook">
+</p>
 
-- **Target:** `survived`
-  - `0` = did not survive
-  - `1` = survived
-- **Model:** Logistic Regression
-- **Task type:** Binary classification
-- **Notebook:** `titanic_logistic_regression_complete.ipynb`
+---
 
-The notebook includes explanatory Markdown cells before the code cells, so each stage is documented before it runs.
+## 📌 Project Overview
 
-## What We Did
+The goal of this project is to predict whether a passenger survived the Titanic disaster using **Logistic Regression** and Seaborn's Titanic dataset.
 
-### 1. Exploratory Data Analysis (EDA)
+Beyond building a classifier, this project explores the complete Machine Learning workflow — from exploratory data analysis and preprocessing to model evaluation, hyperparameter tuning, and coefficient interpretation.
 
-Loaded the Titanic dataset with Seaborn and explored:
+| Component | Description |
+|---|---|
+| **Problem Type** | Binary Classification |
+| **Dataset** | Seaborn Titanic Dataset |
+| **Target Variable** | `survived` |
+| **Algorithm** | Logistic Regression |
+| **Implementation** | Python & Scikit-learn |
+| **Notebook** | `titanic_logistic_regression_complete.ipynb` |
 
-- First rows and dataset dimensions
-- Column names and data types
-- Non-null counts and missing-value counts/percentages
-- Descriptive statistics for numeric and categorical columns
-- Survivor and non-survivor counts and percentages
-- Survival rates by sex and passenger class
-- Exact duplicate rows, without automatically deleting them
+### 🎯 Prediction Target
 
-### 2. Target and Feature Selection
+- `0` — Passenger did not survive
+- `1` — Passenger survived
 
-Set `survived` as the target `y`.
+## 🗺️ Project Workflow
 
-Started with these features:
+```mermaid
+flowchart TD
+    A["🚢 Load Titanic Dataset"] --> B["🔎 Exploratory Data Analysis"]
+    B --> C["🧹 Data Cleaning & Feature Selection"]
+    C --> D["⚙️ Feature Engineering"]
+    D --> E["✂️ Train/Test Split"]
+    E --> F["🔄 Preprocessing Pipelines"]
+    F --> G["🧠 Logistic Regression"]
+    G --> H["📊 Model Evaluation"]
+    H --> I["🎛️ Hyperparameter Tuning"]
+    I --> J["🔍 Coefficient Interpretation"]
+    J --> K["🏁 Final Model Comparison"]
+```
 
-- `pclass`
-- `sex`
-- `age`
-- `sibsp`
-- `parch`
-- `fare`
-- `embarked`
+## 🔎 01 — Exploratory Data Analysis
 
-We excluded `alive` because it directly reveals the target. We also avoided redundant alternatives such as keeping both `pclass` and `class`, or both `embarked` and `embark_town`. The high-missingness `deck` feature and identifier/free-text columns were left out of this first model.
+Investigated the dataset to understand its structure, quality, and relationships before training the model.
 
-### 3. Feature Engineering
+- Inspected dataset dimensions, columns, and data types.
+- Analyzed missing values and their percentages.
+- Generated descriptive statistics.
+- Examined survivor and non-survivor distributions.
+- Compared survival rates by sex and passenger class.
+- Inspected exact duplicate rows without automatically deleting them.
 
-Created two additional features:
+## 🧹 02 — Feature Selection & Data Preparation
 
-- `family_size` = `sibsp` + `parch` + 1
-- `is_alone` = 1 when `family_size` is 1, otherwise 0
+Selected features that provide useful passenger information while avoiding redundant or target-revealing columns.
 
-These features are derived from existing passenger information and do not use the target.
+**Initial features:**
 
-### 4. Numerical and Categorical Features
+`pclass` · `sex` · `age` · `sibsp` · `parch` · `fare` · `embarked`
 
-Numerical features:
+**Target leakage prevention:**
 
-- `age`
-- `sibsp`
-- `parch`
-- `fare`
-- `family_size`
-- `is_alone`
+The `alive` column was excluded because it directly reveals the target. Redundant alternatives such as `class` and `embark_town` were also omitted. The high-missingness `deck` column and identifier/free-text fields were excluded from this initial experiment.
 
-Categorical features:
+## ⚙️ 03 — Feature Engineering
 
-- `pclass`
-- `sex`
-- `embarked`
+Created additional features from existing passenger information:
 
-Although `pclass` is represented by numbers, it is treated as categorical in this experiment because it represents ticket classes.
+| Feature | Definition |
+|---|---|
+| `family_size` | `sibsp + parch + 1` |
+| `is_alone` | `1` if `family_size == 1`, otherwise `0` |
 
-### 5. Train/Test Split
+These features represent family size and whether a passenger was traveling alone.
 
-Split the data into:
+## 🔄 04 — Preprocessing Pipeline
 
-- 80% training data
-- 20% test data
+Separated numerical and categorical features and applied appropriate transformations through Scikit-learn pipelines.
 
-Used `random_state=42` for reproducibility and `stratify=y` to keep the survival proportions approximately consistent between the sets.
+<table>
+  <tr>
+    <th>Numerical Features</th>
+    <th>Categorical Features</th>
+  </tr>
+  <tr>
+    <td>
+      <code>age</code><br>
+      <code>sibsp</code><br>
+      <code>parch</code><br>
+      <code>fare</code><br>
+      <code>family_size</code><br>
+      <code>is_alone</code>
+    </td>
+    <td>
+      <code>pclass</code><br>
+      <code>sex</code><br>
+      <code>embarked</code>
+    </td>
+  </tr>
+</table>
 
-**Important:** The split happens before fitting imputers, encoders, or scalers.
+### Numerical Pipeline
 
-### 6. Preprocessing Pipeline
-
-Built a scikit-learn `ColumnTransformer` with separate preprocessing pipelines.
-
-**Numerical pipeline**
 1. `SimpleImputer(strategy="median")`
 2. `StandardScaler()`
 
-**Categorical pipeline**
+### Categorical Pipeline
+
 1. `SimpleImputer(strategy="most_frequent")`
 2. `OneHotEncoder(handle_unknown="ignore")`
 
-The preprocessing steps are combined with Logistic Regression in a `Pipeline`. This ensures that preprocessing is fitted on the training data only and then applied consistently to the test data, reducing the risk of data leakage.
+Both pipelines are combined using `ColumnTransformer`, then connected to Logistic Regression through a `Pipeline`.
 
-### 7. Model Training
+> **Key practice:** Split the dataset before fitting preprocessing transformations. This prevents information from the test set from leaking into the training process.
 
-Trained a Logistic Regression model with `max_iter=2000` and a fixed random state.
+## ✂️ 05 — Train/Test Split
 
-Generated:
-- Predicted class labels with `predict()`
-- Predicted survival probabilities with `predict_proba()`
+The dataset is split into:
 
-The notebook also displays the number of solver iterations used.
+- **80% training set** — Used to fit the model and preprocessing transformations.
+- **20% test set** — Reserved for evaluating model performance on held-out data.
 
-### 8. Model Evaluation
+The split uses `random_state=42` for reproducibility and `stratify=y` to preserve approximately the same target-class proportions in both sets.
 
-Evaluated predictions on the held-out test set using:
+## 🧠 06 — Model Training
 
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Classification report
-- Confusion matrix
+Trained a Logistic Regression classifier with `max_iter=2000`.
 
-Compared training accuracy with test accuracy as a basic diagnostic for possible overfitting or underfitting.
+The model generates:
 
-The notebook also plots predicted survival probabilities and demonstrates how changing the classification threshold from 0.5 affects metrics. The test set should not be repeatedly used to choose a threshold.
+- Class predictions using `predict()`
+- Survival probabilities using `predict_proba()`
 
-### 9. Preprocessing Strategy Comparison
+The notebook also reports the number of solver iterations used during fitting.
 
-Compared two preprocessing configurations:
+## 📊 07 — Model Evaluation
 
-- Median imputation for numeric columns and most-frequent imputation for categorical columns
-- Mean imputation for numeric columns and a dedicated missing category for categorical columns
+Evaluated the classifier on the held-out test set using:
 
-Both alternatives are fitted using the training set, then compared using test metrics.
+| Metric | Purpose |
+|---|---|
+| Accuracy | Overall proportion of correct predictions |
+| Precision | Proportion of positive predictions that are correct |
+| Recall | Proportion of actual survivors identified |
+| F1 Score | Harmonic mean of precision and recall |
+| Confusion Matrix | Breakdown of correct and incorrect classifications |
+| Classification Report | Summary of class-level evaluation metrics |
 
-### 10. Hyperparameter Tuning
+Training accuracy is compared with test accuracy as an initial diagnostic for possible overfitting or underfitting.
 
-Used `GridSearchCV` with 5-fold stratified cross-validation on the training data to compare these `C` values:
+### 🎚️ Classification Threshold
 
-- `0.01`
-- `0.1`
-- `1.0`
-- `10.0`
-- `100.0`
+The notebook explores how changing the classification threshold from `0.5` to `0.4` affects predictions and evaluation metrics.
 
-`C` is the inverse of regularization strength:
-- Smaller `C` means stronger regularization.
-- Larger `C` means weaker regularization.
+Threshold selection should be based on validation data rather than repeatedly optimizing against the held-out test set.
 
-The best configuration is selected through cross-validation, then evaluated on the held-out test set.
+## 🧪 08 — Preprocessing Strategy Comparison
 
-### 11. Coefficient Interpretation
+Compared two alternative preprocessing configurations:
 
-Extracted the fitted model's feature names and Logistic Regression coefficients.
+- **Configuration A:** Median imputation for numerical features and most-frequent imputation for categorical features.
+- **Configuration B:** Mean imputation for numerical features and a dedicated missing category for categorical features.
 
-- Positive coefficients increase the model's log-odds of survival, holding other encoded features constant.
-- Negative coefficients decrease the model's log-odds of survival.
-- One-hot encoded category coefficients are interpreted relative to the omitted reference category.
+Both configurations are fitted using training data and compared using test metrics.
 
-These coefficients describe model associations and should not be interpreted as proof of causation.
+## 🎛️ 09 — Hyperparameter Tuning
 
-### 12. Final Comparison and Conclusion
+Used `GridSearchCV` with five-fold stratified cross-validation to explore different values of the Logistic Regression parameter `C`.
 
-Created a final comparison table for the baseline and tuned models using the same test set.
+| Parameter | Values |
+|---|---|
+| `C` | `0.01`, `0.1`, `1.0`, `10.0`, `100.0` |
+| Cross-validation | 5-fold Stratified K-Fold |
+| Scoring | F1 Score |
 
-The notebook ends with a conclusion checklist asking for:
-1. Best model and reason
-2. Features that appear influential according to coefficients
-3. Main error type (false positives or false negatives)
-4. Evidence of overfitting or underfitting
-5. A limitation or next experiment
+**Understanding `C`:**
 
-Fill in this conclusion using the actual outputs from your run; scores are not hard-coded because they can vary with library versions and execution environments.
+- Smaller `C` → stronger regularization.
+- Larger `C` → weaker regularization.
 
-## How to Run
+The best configuration is selected through cross-validation on the training data, then evaluated on the held-out test set.
+
+## 🔍 10 — Model Interpretability
+
+Extracted feature names and coefficients from the fitted Logistic Regression model.
+
+- **Positive coefficient:** Increases the modeled log-odds of survival, holding other encoded features constant.
+- **Negative coefficient:** Decreases the modeled log-odds of survival.
+- **One-hot encoded features:** Coefficients are interpreted relative to the omitted reference category.
+
+Coefficients describe associations learned by the model; they do not establish causation.
+
+## 🏁 11 — Final Model Comparison
+
+Compared the baseline and tuned models using the same held-out test set.
+
+The notebook concludes with a checklist for documenting:
+
+- Which model performed best and why.
+- Which features appear influential according to the coefficients.
+- Whether false positives or false negatives are more common.
+- Whether there is evidence of overfitting or underfitting.
+- What limitations remain and which experiment could be explored next.
+
+**Actual metrics and conclusions must be filled in after executing the notebook.** No performance scores are assumed or hard-coded in this documentation.
+
+## 🛠️ Tech Stack
+
+| Technology | Usage |
+|---|---|
+| Python | Core programming language |
+| NumPy | Numerical operations |
+| Pandas | Data manipulation |
+| Seaborn | Dataset loading and visualization |
+| Matplotlib | Charts and plots |
+| Scikit-learn | Preprocessing, modeling, and evaluation |
+| Jupyter Notebook | Interactive experimentation |
+
+## 🚀 How to Run
 
 1. Open `titanic_logistic_regression_complete.ipynb` in Jupyter Notebook or VS Code.
-2. Select the Python environment where the required packages are installed.
-3. Run the cells in order from top to bottom.
-4. If a package is missing, install it in the same environment used by the notebook.
-5. The first call to `sns.load_dataset("titanic")` may require internet access.
+2. Select a Python environment with the required dependencies installed.
+3. Run the notebook cells from top to bottom.
+4. Install any missing dependencies in the same environment.
+5. Ensure internet access is available if the Seaborn dataset needs to be downloaded.
 
-Typical dependencies used by the notebook include:
+Install the main dependencies with:
 
-- `numpy`
-- `pandas`
-- `seaborn`
-- `matplotlib`
-- `scikit-learn`
+```bash
+pip install numpy pandas seaborn matplotlib scikit-learn jupyter
+```
 
-## Key Lessons
+## 💡 Key Takeaways
 
-- Explore missing data before deciding how to handle it.
-- Do not automatically delete duplicate-looking feature rows; different passengers can share the same recorded features.
-- Do not include target-revealing columns such as `alive` in `X`.
-- Split data before fitting preprocessing transformations.
-- Use pipelines to keep imputation, encoding, scaling, and modeling consistent.
-- Use cross-validation on training data for model selection.
+- Explore the dataset before choosing preprocessing strategies.
+- Avoid target leakage and redundant features.
+- Investigate duplicates instead of deleting them blindly.
+- Fit imputers, encoders, and scalers on training data only.
+- Use pipelines to maintain consistent preprocessing.
+- Use cross-validation for model selection.
 - Reserve the test set for final evaluation.
-- Interpret scores and coefficients in context rather than treating them as proof of causation.
+- Interpret metrics and model coefficients in context.
 
-## Project Status
+## 📂 Project Structure
 
-The notebook contains the complete workflow and code for the experiment. Actual model scores and conclusions should be filled in after running the notebook in your own environment.
+```text
+Logistic Regression/
+├── Logistic Regression.ipynb
+└── Project/
+    ├── README.md
+    └── titanic_logistic_regression_complete.ipynb
+```
+
+## 🌱 Project Status
+
+The notebook contains the implementation of the complete experiment, including preprocessing, model training, evaluation, and tuning.
+
+The next step is to execute the notebook, review the actual results, and document the final findings.
+
+---
+
+<p align="center">
+  <strong>Learn the concepts. Build the pipeline. Evaluate the model. Improve the results.</strong>
+  <br><br>
+  Made with 🧠, Python, and curiosity.
+</p>
